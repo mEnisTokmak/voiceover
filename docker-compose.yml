@@ -1,0 +1,15 @@
+services:
+  auditor:
+    build: .
+    image: a11y-auditor
+    ports:
+      - "8000:8000"   # panel: http://localhost:8000
+      - "8765:8765"   # Google Drive ilk yetkilendirme (OAuth dönüşü)
+    env_file:
+      - .env
+    volumes:
+      - ./config:/app/config   # kontroller, hata türleri, istemler: düzenle → anında geçerli
+      - ./data:/data           # oturumlar, veritabanı, modeller, Drive anahtarları
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # Mac'te çalışan Appium'a erişim
+    restart: unless-stopped

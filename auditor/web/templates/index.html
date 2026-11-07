@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block head %}{% if audits|selectattr('durum', 'in', calisan)|list %}<meta http-equiv="refresh" content="6">{% endif %}{% endblock %}
+{% block body %}
+<h1>Yeni denetim</h1>
+<p class="muted">Yapay zekâ arka ucu: <strong>{{ backend }}</strong> · Telefon köprüsü: <span class="mono">{{ appium }}</span></p>
+<div class="grid">
+  <form class="card" method="post" action="/ajan">
+    <h2 style="margin-top:0">📱 Ajanı telefonda gezdir</h2>
+    <label for="a-app">Uygulama</label>
+    <select id="a-app" name="uygulama">{% for x in apps %}<option>{{ x }}</option>{% endfor %}</select>
+    <label for="a-pl">Platform</label>
+    <select id="a-pl" name="platform"><option value="ios">iOS</option><option value="android">Android</option></select>
+    <label for="a-sc">Hazır senaryo</label>
+    <select id="a-sc" name="senaryo">{% for x in scenarios %}<option>{{ x }}</option>{% endfor %}</select>
+    <label for="a-fr">…veya serbest senaryo (doldurulursa hazır senaryo yerine kullanılır)</label>
+    <textarea id="a-fr" name="serbest" placeholder="Örn: Uygulamayı aç, giriş ekranına git, tüm ekranları tara, giriş yapma."></textarea>
+    <p><button type="submit">Başlat</button></p>
+  </form>
+  <form class="card" method="post" action="/video" enctype="multipart/form-data">
+    <h2 style="margin-top:0">🎬 Ekran kaydı yükle ve analiz et</h2>
+    <p class="muted">Telefonda ekran okuyucu açıkken çektiğin kayıt (sesli).</p>
+    <label for="v-app">Uygulama</label>
+    <select id="v-app" name="uygulama">{% for x in apps %}<option>{{ x }}</option>{% endfor %}</select>
+    <label for="v-pl">Platform</label>
+    <select id="v-pl" name="platform"><option value="ios">iOS</option><option value="android">Android</option></select>
+    <label for="v-f">Video dosyası</label>
+    <input id="v-f" type="file" name="dosya" accept="video/*" required>
+    <p><button type="submit">Yükle ve analiz et</button></p>
+  </form>
+</div>
+
+<h2>Denetimler</h2>
+<table>
+  <thead><tr><th>Denetim</th><th>Tür</th><th>Durum</th><th>Bulgu</th><th>Drive</th></tr></thead>
+  <tbody>
+  {% for a in audits %}
+    <tr>
+      <td><a href="/denetim/{{ a.id }}">{{ a.id }}</a></td>
+      <td>{{ a.tur }}</td>
+      <td><span class="pill">{{ a.durum }}</span></td>
+      <td>{{ a.bulgu_sayisi }}</td>
+      <td>{% if a.drive_link %}<a href="{{ a.drive_link }}" target="_blank" rel="noopener">Klasör</a>{% endif %}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="5" class="muted">Henüz denetim yok.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

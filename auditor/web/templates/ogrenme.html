@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Öğrenme ve doğruluk</h1>
+<p class="muted">Bulguları düzelttiğinde, reddettiğinde veya ekstra hata eklediğinde sistem bunu kaydeder.
+Aktif kurallar ve son düzeltmeler her analizde yapay zekâya talimat olarak verilir.</p>
+
+<h2>Hata türüne göre doğruluk</h2>
+<table>
+  <thead><tr><th>Hata türü</th><th>Onaylanan</th><th>Reddedilen</th><th>Kaçırılan (ekstra)</th><th>Kesinlik</th><th>Duyarlılık</th></tr></thead>
+  <tbody>
+  {% for tur, d in dogruluk.items() %}
+    <tr><td>{{ tur }}</td><td>{{ d.onay }}</td><td>{{ d.red }}</td><td>{{ d.eksik }}</td>
+      <td>{{ '%.0f%%'|format(d.kesinlik*100) if d.kesinlik is not none else '—' }}</td>
+      <td>{{ '%.0f%%'|format(d.duyarlilik*100) if d.duyarlilik is not none else '—' }}</td></tr>
+  {% else %}<tr><td colspan="6" class="muted">Henüz veri yok.</td></tr>{% endfor %}
+  </tbody>
+</table>
+
+<h2>Öğrenilmiş kurallar</h2>
+<form class="card" method="post" action="/ders">
+  <label for="d-m">Yeni kural</label>
+  <textarea id="d-m" name="metin" required placeholder="Örn: Fiyat ve tarih alanları uçuş kartının parçasıdır; kart bitmeden bunlara geçilmesi Odak Sırası hatasıdır."></textarea>
+  <label for="d-t">İlgili hata türü (isteğe bağlı)</label>
+  <select id="d-t" name="hata_turu"><option value="">(genel)</option>{% for t in turler %}<option>{{ t }}</option>{% endfor %}</select>
+  <p><button>Ekle</button></p>
+</form>
+{% for d in dersler %}
+<div class="card">
+  <form method="post" action="/ders/{{ d.id }}/guncelle">
+    <label for="dm{{ d.id }}">[{{ d.hata_turu or 'genel' }}] · {{ d.kaynak }} · {{ d.olusturma }}</label>
+    <textarea id="dm{{ d.id }}" name="metin">{{ d.metin }}</textarea>
+    <div class="row" style="margin-top:6px">
+      <select name="aktif" aria-label="Durum"><option value="1" {% if d.aktif %}selected{% endif %}>Aktif</option><option value="0" {% if not d.aktif %}selected{% endif %}>Pasif</option></select>
+      <button class="ghost" style="width:auto">Güncelle</button>
+    </div>
+  </form>
+  <form method="post" action="/ders/{{ d.id }}/sil" style="margin-top:6px"><button class="bad">Sil</button></form>
+</div>
+{% else %}<p class="muted">Henüz kural yok.</p>{% endfor %}
+
+<h2>Son düzeltmeler</h2>
+<table>
+  <thead><tr><th>Tür</th><th>Önce</th><th>Sonra</th><th>Açıklama</th><th>Uygulama</th></tr></thead>
+  <tbody>
+  {% for r in duzeltmeler %}
+    <tr><td>{{ r.tip }}</td><td class="mono">{{ r.once }}</td><td class="mono">{{ r.sonra }}</td><td>{{ r.aciklama }}</td><td>{{ r.uygulama }}/{{ r.platform }}</td></tr>
+  {% else %}<tr><td colspan="5" class="muted">Henüz düzeltme yok.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

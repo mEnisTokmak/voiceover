@@ -1,0 +1,36 @@
+# Genel ayarlar. Ortam değişkenleri (LLM_BACKEND, APPIUM_URL) buradakini ezer.
+
+llm:
+  backend: cli            # cli | api | none
+  cli_model: sonnet       # analiz için (Claude CLI takma adı)
+  cli_agent_model: opus   # telefonu gezen ajan için
+  api_model: claude-sonnet-5-5
+  api_agent_model: claude-opus-5-5
+  kare_per_cagri: 10      # tek yapay zekâ çağrısına gönderilen en fazla ekran görüntüsü
+  zaman_asimi_sn: 900
+
+dil: tr                   # uygulamanın beklenen dili
+
+whisper:
+  model: small            # tiny | base | small | medium | large-v3 (büyüdükçe doğru ama yavaş)
+  device: cpu
+  compute_type: int8
+
+video:
+  en_fazla_kare: 24       # bir videodan analiz için çıkarılacak en fazla kare
+  klip_payi_sn: 3         # bulgu klibinin öncesine/sonrasına eklenen süre
+
+appium:
+  url: http://host.docker.internal:4723
+
+ajan:
+  en_fazla_adim: 150
+  tarama_stratejisi: agac  # şimdilik yalnız "agac" (erişilebilirlik ağacı sırası); gerçek VoiceOver hareketi Faz 0 testinden sonra
+
+ogrenme:
+  en_fazla_ders: 40       # istemde kullanılacak en fazla öğrenilmiş kural
+  en_fazla_ornek: 10      # istemde kullanılacak en fazla geçmiş düzeltme örneği
+
+drive:
+  kok_klasor_adi: "Erişilebilirlik Denetimleri"
+  kok_klasor_id: ""       # boşsa yukarıdaki adla Drive kökünde oluşturulur/bulunur

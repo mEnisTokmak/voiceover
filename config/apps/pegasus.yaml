@@ -1,0 +1,25 @@
+ad: Pegasus
+dil: tr
+
+# Appium bağlantı bilgileri. Paket/bundle adlarını telefonda doğrulayın:
+#   Android: adb shell pm list packages | grep -i pegasus
+#   iOS:     Appium Inspector veya `ideviceinstaller -l`
+ios:
+  bundleId: "DOGRULA.pegasus.bundle.id"   # TODO: gerçek bundle id
+  udid: ""                                  # boşsa bağlı ilk cihaz
+android:
+  appPackage: "com.pozitron.pegasus"        # TODO: doğrulayın
+  appActivity: ""                            # boşsa uygulamanın varsayılan aktivitesi
+  udid: ""
+
+# Ajanın dokunmasının KOD SEVİYESİNDE engellendiği eylemler (düzenli ifade, büyük/küçük harf duyarsız)
+yasakli_eylemler:
+  - "öde"
+  - "ödeme yap"
+  - "satın al"
+  - "rezervasyonu (onayla|tamamla)"
+  - "siparişi (onayla|tamamla)"
+  - "hesabı sil"
+  - "pay"
+  - "purchase"
+  - "confirm (booking|payment)"

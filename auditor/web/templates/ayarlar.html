@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Kontroller ve ayarlar</h1>
+<p class="muted">Değişiklikler kaydedildiği anda bir sonraki analizde geçerli olur; yeniden başlatma gerekmez.
+<strong>checks.yaml</strong>: neye bakılacağı · <strong>wcag_katalog.yaml</strong>: hata türleri ·
+<strong>prompts/</strong>: yapay zekâ talimatları · <strong>apps/</strong>: uygulama profilleri · <strong>scenarios/</strong>: ajan senaryoları.</p>
+{% if mesaj %}<p class="card" role="status"><strong>{{ mesaj }}</strong></p>{% endif %}
+<div class="row" style="align-items:flex-start;gap:16px">
+  <nav class="card" style="min-width:220px" aria-label="Dosyalar">
+    {% for f in dosyalar %}<div><a href="/ayarlar?dosya={{ f|urlencode }}" {% if f == dosya %}aria-current="page" style="font-weight:700"{% endif %}>{{ f }}</a></div>{% endfor %}
+  </nav>
+  <form method="post" action="/ayarlar" style="flex:1;min-width:300px">
+    <input type="hidden" name="dosya" value="{{ dosya }}">
+    <label for="ic">{{ dosya }}</label>
+    <textarea id="ic" name="icerik" class="mono" style="min-height:560px">{{ icerik }}</textarea>
+    <label for="yeni">Farklı kaydet (yeni dosya, ör. scenarios/thy_check_in.md veya apps/thy.yaml) — boş bırak: üzerine yaz</label>
+    <input id="yeni" name="yeni_ad" placeholder="">
+    <p><button>Kaydet</button></p>
+  </form>
+</div>
+{% endblock %}

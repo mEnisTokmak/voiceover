@@ -1,0 +1,105 @@
+# KONTROLLER — sistemin neye bakacağı burada tanımlanır.
+#
+#   tur: kural  -> kod içindeki hazır, ölçülebilir bir kural (parametreleri buradan değişir)
+#                  hazır kurallar: dil, anlamsiz_etiket, dokunma_hedefi, tekrar_eden_etiket
+#   tur: llm    -> yapay zekâya verilen talimat. YENİ KONTROL EKLEMEK İÇİN KOD GEREKMEZ:
+#                  bir madde ekleyip "talimat" yazmanız yeterli.
+#
+#   etkin: false yaparak bir kontrolü kapatabilirsiniz.
+#   hata_turu: wcag_katalog.yaml içindeki "ad" ile aynı olmalı.
+
+kontroller:
+  - id: dil_ozelligi
+    etkin: true
+    tur: kural
+    kural: dil
+    hata_turu: Dil Özelliği
+    guven: 0.9
+    parametreler:
+      beklenen_dil: tr
+      yalniz_ses_dili_ile_raporla: false   # true: sözcük kanıtı olmadan, yalnız ses dili tahminiyle de raporla (gürültülü)
+      dil_olasilik_esigi: 0.8
+      # Türkçe arayüzde duyulmaması gereken İngilizce kelimeler (küçük harf)
+      ingilizce_kelimeler: [back, button, close, cancel, done, search, menu, settings, heading,
+                            selected, image, tab, next, previous, ok, home, more, edit, delete,
+                            share, filter, sort, continue, submit, login, logout, profile, navigate up]
+      # Türkçe ses İngilizce etiketi Türkçe fonetikle okur; konuşma tanıma bunu Türkçe sanır.
+      # İngilizce karşılık: düzenli ifade (yakalanan transkript metninde aranır). Yeni örnek gördükçe ekleyin.
+      fonetik_kaliplar:
+        back arrow: "\\bbeker ?o[gğ]l?u\\b|\\bbekero[gğ]u\\b|\\bbek ?ero\\b"
+        back: "\\bbek\\b"
+        button: "\\bbat[ıi]n\\b"
+        close: "\\bklo[sz]\\b"
+        navigate up: "\\bnavigeyt\\b"
+
+  - id: anlamsiz_etiket
+    etkin: true
+    tur: kural
+    kural: anlamsiz_etiket
+    hata_turu: Etiket Hatası
+    guven: 0.85
+    parametreler:
+      kaliplar: ["^button$", "^düğme$", "^image$", "^görsel$", "^icon", "^ic_", "\\.(png|jpg|svg|pdf)$", "^img_", "^[A-Za-z]+_[A-Za-z_]+$"]
+      etiketsiz_tiklanabilir: true
+
+  - id: dokunma_hedefi
+    etkin: true
+    tur: kural
+    kural: dokunma_hedefi
+    hata_turu: Dokunma Hedefi Küçük
+    guven: 0.8
+    parametreler:
+      en_kucuk_pt: 24
+
+  - id: tekrar_eden_etiket
+    etkin: true
+    tur: kural
+    kural: tekrar_eden_etiket
+    hata_turu: Etiket Hatası
+    guven: 0.6
+    parametreler: {}
+
+  - id: odak_sirasi
+    etkin: true
+    tur: llm
+    hata_turu: Odak Sırası
+    talimat: >
+      Ekran okuyucunun öğeleri okuma sırasını, ekrandaki görsel okuma sırasıyla (yukarıdan aşağı,
+      soldan sağa, kart/grup bütünlüğü) karşılaştır. Bir kartın/grubun içeriği bitmeden başka bir
+      gruba atlanıyorsa, sonra geri dönülüyorsa veya mantıksız bir sıra varsa raporla. Hangi öğeden
+      hangi öğeye atlandığını nota yaz.
+
+  - id: baslik_eksik
+    etkin: true
+    tur: llm
+    hata_turu: Başlık Eksik
+    talimat: >
+      Görsel olarak bölüm/sayfa başlığı olan metinleri (daha büyük/kalın, bir bölümü açan) bul.
+      Ekran okuyucu bunları okurken "başlık" / "heading" demiyorsa veya erişilebilirlik ağacında
+      başlık özelliği yoksa raporla.
+
+  - id: rol_ve_durum
+    etkin: true
+    tur: llm
+    hata_turu: Rol Eksik
+    talimat: >
+      Düğme, sekme, bağlantı, onay kutusu, açılır menü gibi etkileşimli öğelerin rolü duyuruluyor mu?
+      Seçili/açık/kapalı/genişletilmiş gibi durumlar duyuruluyor mu? Rol eksikse "Rol Eksik",
+      durum eksikse "Durum Bilgisi Eksik" türüyle raporla.
+
+  - id: etiket_anlamli_mi
+    etkin: true
+    tur: llm
+    hata_turu: Etiket Hatası
+    talimat: >
+      Okunan etiketler öğenin işlevini anlatıyor mu? Simge düğmeleri sadece "düğme" diye mi okunuyor?
+      Görünen metin erişilebilir adda geçiyor mu (geçmiyorsa "Görünen Metin ile Etiket Uyumsuz")?
+      Dekoratif öğeler gereksiz yere odak alıyor mu ("Gereksiz Odak")?
+
+  - id: durum_mesaji
+    etkin: true
+    tur: llm
+    hata_turu: Durum Mesajı Duyurulmuyor
+    talimat: >
+      Ekranda yükleniyor göstergesi, hata, uyarı, "eklendi" gibi dinamik bir mesaj göründüğü hâlde
+      ekran okuyucu bunu söylemiyorsa raporla.

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Erişilebilirlik Denetimi{% endblock %}</title>
+{% block head %}{% endblock %}
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1b1f24; --muted:#5d6670; --line:#dde1e6; --acc:#0b5cad; --ok:#1a7f37; --bad:#b42318; --warn:#9a6700; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:#12263f; color:#fff; padding:12px 20px; display:flex; gap:24px; align-items:center; flex-wrap:wrap; }
+  header a { color:#cfe3ff; text-decoration:none; font-weight:500; }
+  header a:hover, header a:focus { color:#fff; text-decoration:underline; }
+  header strong { font-size:17px; margin-right:auto; }
+  main { max-width:1180px; margin:0 auto; padding:20px 16px 60px; }
+  h1 { font-size:22px; margin:6px 0 16px; } h2 { font-size:18px; margin:24px 0 10px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:14px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px,1fr)); gap:14px; }
+  label { display:block; font-weight:600; font-size:13px; margin:8px 0 3px; color:var(--muted); }
+  input, select, textarea { width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:6px; font:inherit; background:#fff; }
+  textarea { min-height:70px; resize:vertical; }
+  button, .btn { display:inline-block; padding:8px 14px; border-radius:6px; border:1px solid var(--acc); background:var(--acc); color:#fff; font:inherit; font-weight:600; cursor:pointer; text-decoration:none; }
+  button.ghost, .btn.ghost { background:#fff; color:var(--acc); }
+  button.ok { background:var(--ok); border-color:var(--ok); } button.bad { background:#fff; color:var(--bad); border-color:var(--bad); }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline:3px solid #f5b400; outline-offset:2px; }
+  table { width:100%; border-collapse:collapse; background:#fff; } th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { font-size:13px; color:var(--muted); }
+  .pill { display:inline-block; padding:1px 8px; border-radius:99px; font-size:12px; font-weight:600; background:#eef1f4; }
+  .pill.onaylandi { background:#dafbe1; color:var(--ok); } .pill.reddedildi { background:#ffebe9; color:var(--bad); } .pill.beklemede { background:#fff8c5; color:var(--warn); }
+  .muted { color:var(--muted); } .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  pre.log { background:#0d1117; color:#c9d1d9; padding:12px; border-radius:8px; max-height:260px; overflow:auto; font-size:12.5px; white-space:pre-wrap; }
+  video, img.shot { max-width:100%; max-height:420px; border-radius:8px; border:1px solid var(--line); background:#000; }
+  details summary { cursor:pointer; font-weight:600; color:var(--acc); }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; }
+</style>
+</head>
+<body>
+<header>
+  <strong>♿ Erişilebilirlik Denetimi</strong>
+  <nav class="row" aria-label="Ana menü">
+    <a href="/">Denetimler</a>
+    <a href="/ogrenme">Öğrenme ve Doğruluk</a>
+    <a href="/ayarlar">Kontroller ve Ayarlar</a>
+  </nav>
+</header>
+<main>{% block body %}{% endblock %}</main>
+</body>
+</html>

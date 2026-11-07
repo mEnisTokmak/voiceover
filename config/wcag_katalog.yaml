@@ -1,0 +1,88 @@
+# HATA TÜRÜ KATALOĞU
+# Drive'daki "Hata Türü" sütunu buradaki "ad" değerlerinden gelir.
+# Kendi WCAG hata listenizle değiştirin / genişletin. Yeni tür eklemek = yeni madde eklemek.
+
+hata_turleri:
+  - ad: Odak Sırası
+    wcag: ["2.4.3", "1.3.2"]
+    seviye: A
+    aciklama: "Ekran okuyucu öğeleri görsel/mantıksal okuma sırasına aykırı dolaşıyor."
+    cozum_ios: "accessibilityElements ile sırayı belirleyin; ilişkili içeriği shouldGroupAccessibilityChildren veya tek bir erişilebilirlik öğesi ile gruplayın."
+    cozum_android: "accessibilityTraversalBefore/After kullanın; kart içeriğini screenReaderFocusable bir kapsayıcıda gruplayın (Compose: Modifier.semantics(mergeDescendants = true))."
+
+  - ad: Dil Özelliği
+    wcag: ["3.1.2", "3.1.1"]
+    seviye: AA
+    aciklama: "Metin yanlış dilde seslendiriliyor (ör. Türkçe arayüzde İngilizce okuma)."
+    cozum_ios: "accessibilityLabel değerlerini yerelleştirin (tr.lproj); gerekirse accessibilityLanguage = \"tr-TR\" atayın."
+    cozum_android: "contentDescription değerlerini strings.xml (values-tr) üzerinden verin; gerekirse LocaleSpan kullanın."
+
+  - ad: Başlık Eksik
+    wcag: ["1.3.1", "2.4.6"]
+    seviye: A
+    aciklama: "Görsel olarak başlık olan metin ekran okuyucuya başlık olarak bildirilmiyor."
+    cozum_ios: "SwiftUI .accessibilityAddTraits(.isHeader) / UIKit accessibilityTraits.insert(.header)."
+    cozum_android: "ViewCompat.setAccessibilityHeading(view, true) / Compose Modifier.semantics { heading() }."
+
+  - ad: Etiket Hatası
+    wcag: ["4.1.2", "1.1.1"]
+    seviye: A
+    aciklama: "Öğenin erişilebilir adı eksik, anlamsız (button, image, dosya adı) veya işlevini anlatmıyor."
+    cozum_ios: "Anlamlı ve kısa bir accessibilityLabel verin; dekoratif görselleri accessibilityHidden yapın."
+    cozum_android: "Anlamlı contentDescription verin; dekoratif görseller için importantForAccessibility=\"no\"."
+
+  - ad: Rol Eksik
+    wcag: ["4.1.2"]
+    seviye: A
+    aciklama: "Öğenin rolü (düğme, sekme, bağlantı, onay kutusu) duyurulmuyor veya yanlış."
+    cozum_ios: "Doğru accessibilityTraits (.button, .link, .tabBar...) atayın."
+    cozum_android: "Doğru bileşeni kullanın veya AccessibilityNodeInfo className / Compose Role atayın."
+
+  - ad: Durum Bilgisi Eksik
+    wcag: ["4.1.2"]
+    seviye: A
+    aciklama: "Seçili, açık/kapalı, genişletilmiş gibi durumlar duyurulmuyor."
+    cozum_ios: ".selected trait, accessibilityValue kullanın."
+    cozum_android: "stateDescription, isSelected, isChecked kullanın."
+
+  - ad: Görünen Metin ile Etiket Uyumsuz
+    wcag: ["2.5.3"]
+    seviye: A
+    aciklama: "Ekranda yazan metin, erişilebilir adın içinde geçmiyor."
+    cozum_ios: "accessibilityLabel görünen metni içermeli."
+    cozum_android: "contentDescription görünen metni içermeli (veya kaldırılıp text kullanılmalı)."
+
+  - ad: Gereksiz Odak
+    wcag: ["1.3.1", "1.1.1"]
+    seviye: A
+    aciklama: "Dekoratif veya anlamsız öğeler odak alıyor, içerik parçalanmış okunuyor."
+    cozum_ios: "Dekoratif öğeleri isAccessibilityElement = false yapın; parçaları gruplayın."
+    cozum_android: "importantForAccessibility=\"no\"; ilgili parçaları birleştirin."
+
+  - ad: Durum Mesajı Duyurulmuyor
+    wcag: ["4.1.3"]
+    seviye: AA
+    aciklama: "Hata, yükleniyor, eklendi gibi dinamik mesajlar ekran okuyucuya bildirilmiyor."
+    cozum_ios: "UIAccessibility.post(notification: .announcement, argument:) kullanın."
+    cozum_android: "accessibilityLiveRegion veya announceForAccessibility kullanın."
+
+  - ad: Dokunma Hedefi Küçük
+    wcag: ["2.5.8"]
+    seviye: AA
+    aciklama: "Etkileşimli öğe 24x24 pt'den küçük."
+    cozum_ios: "Dokunma alanını en az 44x44 pt yapın (contentShape / hitTest genişletme)."
+    cozum_android: "Dokunma alanını en az 48x48 dp yapın (minHeight / TouchDelegate)."
+
+  - ad: Odak Tuzağı / Erişilemeyen Öğe
+    wcag: ["2.1.1", "2.1.2"]
+    seviye: A
+    aciklama: "Ekran okuyucu bir bölgeden çıkamıyor veya bir öğeye hiç ulaşamıyor."
+    cozum_ios: "Modal/özel görünümlerde accessibilityViewIsModal ve öğe hiyerarşisini düzeltin."
+    cozum_android: "Görünürlük/odaklanabilirlik ayarlarını ve paneTitle kullanımını düzeltin."
+
+  - ad: Form Etiketi / Hata İlişkisi
+    wcag: ["3.3.1", "3.3.2"]
+    seviye: A
+    aciklama: "Form alanının etiketi veya hata mesajı alanla ilişkilendirilmemiş."
+    cozum_ios: "Alanın accessibilityLabel'ında etiketi, accessibilityValue/hint'te hatayı verin."
+    cozum_android: "TextInputLayout setError / labelFor / Compose semantics { error() } kullanın."

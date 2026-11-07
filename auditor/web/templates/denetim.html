@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}{{ a.id }}{% endblock %}
+{% block head %}{% if calisan %}<meta http-equiv="refresh" content="5">{% endif %}{% endblock %}
+
+{% macro alanlar(v, pre) %}
+  <label for="{{pre}}-baslik">Başlık</label>
+  <input id="{{pre}}-baslik" name="baslik" value="{{ v.baslik or '' }}" required>
+  <div class="grid" style="gap:10px">
+    <div><label for="{{pre}}-tur">Hata türü</label>
+      <select id="{{pre}}-tur" name="hata_turu">{% for t in turler %}<option {% if t == v.hata_turu %}selected{% endif %}>{{ t }}</option>{% endfor %}</select></div>
+    <div><label for="{{pre}}-wcag">WCAG (virgülle; boşsa katalogdan)</label>
+      <input id="{{pre}}-wcag" name="wcag" value="{{ (v.wcag or [])|join(', ') }}"></div>
+    <div><label for="{{pre}}-onem">Önem</label>
+      <select id="{{pre}}-onem" name="onem">{% for o in ['Yüksek','Orta','Düşük'] %}<option {% if o == v.onem %}selected{% endif %}>{{ o }}</option>{% endfor %}</select></div>
+    <div><label for="{{pre}}-ekran">Ekran</label>
+      <input id="{{pre}}-ekran" name="ekran" value="{{ v.ekran or '' }}"></div>
+  </div>
+  <label for="{{pre}}-not">Not</label>
+  <textarea id="{{pre}}-not" name="not">{{ v['not'] or '' }}</textarea>
+  <label for="{{pre}}-coz">Çözüm önerisi (boşsa katalogdan)</label>
+  <textarea id="{{pre}}-coz" name="cozum_onerisi">{{ v.cozum_onerisi or '' }}</textarea>
+  <label for="{{pre}}-ders">🧠 Sisteme öğret (isteğe bağlı): bundan sonra benzer durumda ne yapmalı?</label>
+  <textarea id="{{pre}}-ders" name="ders" placeholder="Örn: Geri düğmesinin İngilizce okunması 'Etiket Hatası' değil 'Dil Özelliği' olarak girilmeli."></textarea>
+{% endmacro %}
+
+{% block body %}
+<p><a href="/">← Denetimler</a></p>
+<h1>{{ a.id }}</h1>
+<div class="row">
+  <span class="pill">{{ a.durum }}</span>
+  <span class="muted">{{ a.uygulama }} · {{ a.platform }} · {{ a.tur }}</span>
+  {% if a.drive_link %}<a class="btn ghost" href="{{ a.drive_link }}" target="_blank" rel="noopener">Drive klasörü</a>{% endif %}
+</div>
+<div class="row" style="margin:12px 0">
+  <form method="post" action="/denetim/{{ a.id }}/drive"><button class="ok" {% if calisan %}disabled{% endif %}>Onaylananları Drive'a yükle</button></form>
+  <form method="post" action="/denetim/{{ a.id }}/yeniden"><button class="ghost" {% if calisan %}disabled{% endif %}>Yeniden analiz et (bekleyenler silinir)</button></form>
+</div>
+<details {% if calisan or a.durum == 'hata' %}open{% endif %}><summary>İşlem günlüğü</summary><pre class="log">{{ a.log }}</pre></details>
+
+<h2>Bulgular ({{ bulgular|length }})</h2>
+{% for b in bulgular %}{% set v = b.veri %}
+<article class="card" id="b{{ b.id }}">
+  <div class="row" style="justify-content:space-between">
+    <h3 style="margin:0;font-size:16px">{{ loop.index }}. {{ v.baslik }}</h3>
+    <span class="pill {{ b.durum }}">{{ b.durum }}</span>
+  </div>
+  <p class="muted" style="margin:4px 0 10px">
+    <strong>{{ v.hata_turu }}</strong> · WCAG {{ (v.wcag or [])|join(', ') }} {{ v.seviye }} · Önem: {{ v.onem }}
+    · Güven: {{ '%.0f'|format((v.guven or 0)*100) }}% · {{ 'Manuel (Ekstra)' if v.kaynak == 'manuel' else 'Otomatik' }}
+    {% if v.kontrol_id %}· kontrol: <span class="mono">{{ v.kontrol_id }}</span>{% endif %}
+  </p>
+  <div class="grid">
+    <div>
+      {% if b.klip_yolu %}<video controls preload="metadata" src="/dosya?yol={{ b.klip_yolu|urlencode }}"></video>
+      {% elif b.gorsel_yolu %}<img class="shot" alt="Bulgunun görüldüğü ekran" src="/dosya?yol={{ b.gorsel_yolu|urlencode }}">{% endif %}
+      {% if v.soylenen %}<p><strong>Duyulan:</strong> “{{ v.soylenen }}”</p>{% endif %}
+      <p><strong>Not:</strong> {{ v['not'] }}</p>
+      <p><strong>Çözüm önerisi:</strong> {{ v.cozum_onerisi }}</p>
+    </div>
+    <div>
+      {% if b.durum == 'beklemede' %}
+      <div class="row">
+        <form method="post" action="/bulgu/{{ b.id }}/onayla"><button class="ok">✓ Onayla</button></form>
+        <form method="post" action="/bulgu/{{ b.id }}/reddet" class="row">
+          <input id="r{{ b.id }}" name="neden" aria-label="Red nedeni" placeholder="Neden hata değil? (öğrenir)" style="width:220px">
+          <button class="bad">✗ Reddet</button>
+        </form>
+      </div>
+      {% else %}
+      <form method="post" action="/bulgu/{{ b.id }}/geri_al"><button class="ghost">Kararı geri al</button></form>
+      {% endif %}
+      <details style="margin-top:10px"><summary>Düzenle ve onayla (düzeltme sisteme öğretilir)</summary>
+        <form method="post" action="/bulgu/{{ b.id }}/kaydet">{{ alanlar(v, 'e' ~ b.id) }}<p><button>Kaydet ve onayla</button></p></form>
+      </details>
+    </div>
+  </div>
+</article>
+{% else %}
+<p class="muted">{% if calisan %}Analiz sürüyor, sayfa kendini yenileyecek…{% else %}Bulgu yok.{% endif %}</p>
+{% endfor %}
+
+<h2>➕ Ekstra hata ekle (sistemin kaçırdığı)</h2>
+<form class="card" method="post" action="/denetim/{{ a.id }}/ekstra">
+  {{ alanlar({'onem':'Orta'}, 'x') }}
+  <div class="grid" style="gap:10px">
+    <div><label for="x-bas">Videoda başlangıç (sn, klip için)</label><input id="x-bas" name="baslangic_sn" type="number" step="0.1" min="0"></div>
+    <div><label for="x-bit">Bitiş (sn)</label><input id="x-bit" name="bitis_sn" type="number" step="0.1" min="0"></div>
+  </div>
+  <p><button>Ekle</button></p>
+</form>
+{% endblock %}
